@@ -1,12 +1,50 @@
-# React + Vite
+# 🔗 Link Management Dashboard  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern **React + Tailwind** based dashboard UI for managing domains, billing, subscription, invoices, teams, user profiles, and settings.  
+This project is modular and includes multiple pages like **Profile**, **Default Settings**, **Geo Templates**, **Campaign Templates**, **Security**, and more.  
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features  
 
-## Expanding the ESLint configuration
+- 📊 **Dashboard**  
+  - Clicks Analytics  
+  - Domain Statistics  
+  - Domain Settings  
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- ⚙️ **Settings**  
+  - Team Management  
+  - Billing & Payments  
+  - Invoices  
+  - Subscription Plans  
+  - Profile Management  
+  - Plan Information  
+
+- 👤 **Profile Section**  
+  - User Information  
+  - Default Settings  
+  - Geo Templates  
+  - Campaign Templates  
+  - Security  
+
+- 💳 **Billing & Subscription**  
+  - Payment history  
+  - Invoice listing  
+  - Upgrade/Downgrade subscription  
+  - Plan info overview  
+
+- 🛠 **Other Pages**  
+  - Help / Documentation  
+
+---
+
+## 🛠️ Tech Stack  
+
+- **Frontend:** React.js, Tailwind CSS, Lucide Icons  
+- **State Management:** React Hooks (useState, Context API)  
+- **Styling:** Tailwind CSS + Custom components  
+
+---
+
+## 📂 Project Structure  
+
