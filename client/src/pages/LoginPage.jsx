@@ -15,7 +15,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError("");
 
-    const res = await axios("http://localhost:8000/api/user/login", {
+    const res = await axios(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
       method: "POST",
       data: { email, password }
     });
@@ -26,7 +26,7 @@ const LoginPage = () => {
     } else {
       setError(res.data.message);
     }
-    
+
   };
 
   return (

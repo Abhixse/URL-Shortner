@@ -25,13 +25,13 @@ const SignupPage = () => {
       password
     };
     setError("");
-    const res = await axios("http://localhost:8000/api/user/signup", {
+    const res = await axios(`${import.meta.env.VITE_API_BASE_URL}/user/signup`, {
       method: "POST",
       data: bodyData
     });
 
     console.log(res);
-    if(res.data.status == true) {
+    if (res.data.status == true) {
       // User created successfully
       setUser(res.data.user);
       navigate("/login");
