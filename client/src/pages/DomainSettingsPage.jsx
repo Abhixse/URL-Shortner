@@ -1,22 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Globe, Plus, Trash2, CheckCircle, AlertCircle } from "lucide-react";
+import axios from "axios";
 
 const DomainSettingsPage = () => {
-  const [domains, setDomains] = useState([
-    { id: 1, name: "myshort.ly", status: "verified" },
-    { id: 2, name: "clicktrack.me", status: "pending" },
-  ]);
-
+  const [domains, setDomains] = useState([]);
   const [newDomain, setNewDomain] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleAddDomain = () => {
-    if (!newDomain) return;
-    setDomains([...domains, { id: Date.now(), name: newDomain, status: "pending" }]);
-    setNewDomain("");
+  // 🔹 Fetch domains from backend on mount
+  useEffect(() => {
+    const fetchDomains = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get("/api/domains", { withCredentials: true });
+        setDomains(data);
+      } catch (error) {
+        console.error("Error fetching domains:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDomains();
+  }, []);
+
+  // 🔹 Add new domain
+  const handleAddDomain = async () => {
+    if (!newDomain.trim()) return;
+    try {
+      const { data } = await axios.post(
+        "/api/domains",
+        { name: newDomain },
+        { withCredentials: true }
+      );
+      setDomains((prev) => [...prev, data]);
+      setNewDomain("");
+    } catch (error) {
+      console.error("Error adding domain:", error);
+    }
   };
 
-  const handleRemoveDomain = (id) => {
-    setDomains(domains.filter((d) => d.id !== id));
+  // 🔹 Remove domain
+  const handleRemoveDomain = async (id) => {
+    try {
+      await axios.delete(`/api/domains/${id}`, { withCredentials: true });
+      setDomains((prev) => prev.filter((d) => d._id !== id));
+    } catch (error) {
+      console.error("Error deleting domain:", error);
+    }
   };
 
   return (
@@ -50,13 +80,15 @@ const DomainSettingsPage = () => {
       {/* Domain List */}
       <div className="bg-white shadow rounded-lg p-4">
         <h2 className="text-lg font-semibold mb-4">Your Domains</h2>
-        {domains.length === 0 ? (
+        {loading ? (
+          <p className="text-gray-500">Loading domains...</p>
+        ) : domains.length === 0 ? (
           <p className="text-gray-500">No domains added yet.</p>
         ) : (
           <ul className="space-y-3">
             {domains.map((domain) => (
               <li
-                key={domain.id}
+                key={domain._id}
                 className="flex justify-between items-center p-3 border rounded-lg"
               >
                 <div className="flex items-center gap-2">
@@ -73,11 +105,13 @@ const DomainSettingsPage = () => {
                         : "text-yellow-600"
                     }`}
                   >
-                    {domain.status === "verified" ? "Verified" : "Pending Verification"}
+                    {domain.status === "verified"
+                      ? "Verified"
+                      : "Pending Verification"}
                   </span>
                 </div>
                 <button
-                  onClick={() => handleRemoveDomain(domain.id)}
+                  onClick={() => handleRemoveDomain(domain._id)}
                   className="text-red-500 hover:text-red-700"
                 >
                   <Trash2 size={18} />

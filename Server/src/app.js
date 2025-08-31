@@ -3,15 +3,24 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import userRoutes from "./routes/User.route.js";
 import urlRoutes from "./routes/Url.routes.js";
+import clickRoutes from "./routes/click.routes.js";
+import domainRoutes from "./routes/domain.routes.js"
+import cors from "cors"
 
 const app = express();
+
 
 // ✅ Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 // ✅ Express settings
 app.disable("x-powered-by");
@@ -47,5 +56,8 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "same-origin" }));
 
 app.use('/api/user/', userRoutes);
 app.use('/api/url/', urlRoutes);
+app.use('/api/click/', clickRoutes);
+app.use("/api/domains", domainRoutes);
+
 
 export { app };

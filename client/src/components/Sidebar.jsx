@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
     LogOut,
     ChevronDown,
@@ -18,11 +18,13 @@ import {
 } from "lucide-react";
 import { useLocalAction } from "../context/LocalActionProvider.jsx";
 import { Link } from "react-router-dom";
+import { ApiContext } from "../context/ApiContext.jsx";
 
 const Sidebar = () => {
     const [openDashboard, setOpenDashboard] = useState(false);
     const [openSettings, setOpenSettings] = useState(false);
     const { isMenuOpen } = useLocalAction();
+    const { user } = useContext(ApiContext);
 
     return (
         <aside
@@ -33,14 +35,20 @@ const Sidebar = () => {
                 {/* Profile Section */}
                 <div className="flex flex-col items-start gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
-                        A
+                        {user && user.fullname ? user.fullname[0] : "A"}
                     </div>
                     <div className="flex items-center justify-between w-full">
                         <div className="flex-1">
-                            <h3 className="text-gray-900 font-semibold">Abhishek Yadav</h3>
-                            <p className="text-gray-500 text-sm">abhishek@example.com</p>
+                            <h3 className="text-gray-900 font-semibold">{user && user.fullname ? user.fullname : "Guest"}</h3>
+                            <p className="text-gray-500 text-sm">{user && user.email ? user.email : "guest@example.com"}</p>
                         </div>
-                        <button className="text-gray-500 hover:text-red-500">
+                        <button
+                            className="text-gray-500 hover:text-red-500"
+                            onClick={() => {
+                                localStorage.removeItem("token"); // clear JWT
+                                window.location.href = "/login";  // redirect
+                            }}
+                        >
                             <LogOut size={20} />
                         </button>
                     </div>

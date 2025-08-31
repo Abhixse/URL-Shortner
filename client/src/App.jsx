@@ -1,8 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { LocalActionProvider } from "./context/LocalActionProvider.jsx";
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { LocalActionProvider, useLocalAction } from "./context/LocalActionProvider.jsx";
+import { useContext } from "react";
+import { ApiContext } from "./context/ApiContext.jsx";
 
+// Components
 import Sidebar from "./components/Sidebar.jsx";
 import LoggedInHeader from "./components/LoggedInHeader.jsx";
+import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import NotificationPanel from "./components/NotificationPanel.jsx";
 
@@ -18,31 +22,62 @@ import SubscriptionPage from "./pages/SubscriptionPage.jsx";
 import InvoicePage from "./pages/InvoicePage.jsx";
 import PaymentPage from "./pages/PaymentPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
-import PlaneInfo from "./pages/PlanInfoPage.jsx"
+import PlaneInfo from "./pages/PlanInfoPage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
+// ✅ Protected Route wrapper
+const PrivateRoute = ({ children }) => {
+  const { user } = useContext(ApiContext);
+  return user ? children : <Navigate to="/login" />;
+};
 
-import { useLocalAction } from "./context/LocalActionProvider.jsx";
+// ✅ Public Layout (Header + LandingPage etc.)
+const PublicLayout = () => (
+  <div>
+    <Header />
+    <Outlet />
+    <Footer />
+  </div>
+);
 
-const Layout = () => {
+// ✅ Private Layout (Sidebar + LoggedInHeader etc.)
+const PrivateLayout = () => {
   const { isMenuOpen } = useLocalAction();
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Main Section (Header + Content + Footer) */}
-      <div
-        className={`flex-1 transition-all duration-300 ${
-          isMenuOpen ? "ml-64" : "ml-0"
-        }`}
-      >
+      <div className={`flex-1 transition-all duration-300 ${isMenuOpen ? "ml-64" : "ml-0"}`}>
         <LoggedInHeader />
-
-        {/* Route Pages */}
         <div className="p-6">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
+          <Outlet />
+        </div>
+        <NotificationPanel />
+        <Footer />
+      </div>
+    </div>
+  );
+};
+
+function App() {
+  const { user } = useContext(ApiContext);
+
+  return (
+    <LocalActionProvider>
+      <Router>
+        <Routes>
+          {/* Public routes */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+          </Route>
+
+          {/* Private routes */}
+          <Route element={<PrivateRoute><PrivateLayout /></PrivateRoute>}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/clicks" element={<ClicksPage />} />
             <Route path="/domain-settings" element={<DomainSettingsPage />} />
             <Route path="/domain-statistics" element={<DomainStatisticsPage />} />
@@ -54,21 +89,8 @@ const Layout = () => {
             <Route path="/payment" element={<PaymentPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/plan-info" element={<PlaneInfo />} />
-          </Routes>
-        </div>
-
-        <NotificationPanel />
-        <Footer />
-      </div>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <LocalActionProvider>
-      <Router>
-        <Layout />
+          </Route>
+        </Routes>
       </Router>
     </LocalActionProvider>
   );

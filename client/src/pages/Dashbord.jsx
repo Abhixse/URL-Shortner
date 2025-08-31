@@ -1,60 +1,84 @@
-import React from "react";
+import React, { useEffect, useContext } from "react";
 import { useLocalAction } from "../context/LocalActionProvider.jsx";
+import { ApiContext } from "../context/ApiContext.jsx";
 
 const Dashboard = () => {
-    const { isMenuOpen } = useLocalAction();
+  const { isMenuOpen } = useLocalAction();
+  const { urls, analytics, fetchUrls, fetchAnalytics, loading, error } = useContext(ApiContext);
 
-    return (
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+  // Fetch data when component mounts
+  useEffect(() => {
+    fetchUrls();
+    fetchAnalytics();
+  }, []);
 
-    {/* Example Dashboard Grid */ }
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Card 1 */}
+  // Derived stats
+  const totalClicks = analytics.reduce((sum, a) => sum + (a.clicks || 0), 0);
+  const activeDomains = [...new Set(urls.map((u) => new URL(u.originalUrl).hostname))].length;
+  const subscription = "Free"; // later fetch from user data
+
+  return (
+    <main
+      className={`flex-1 overflow-y-auto p-6 bg-gray-50 transition-all ${
+        isMenuOpen ? "ml-64" : "ml-16"
+      }`}
+    >
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+
+      {loading && <p className="text-gray-500">Loading data...</p>}
+      {error && <p className="text-red-500">Error: {error}</p>}
+
+      {/* Dashboard Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold mb-2">Total Clicks</h2>
-            <p className="text-3xl font-bold text-blue-600">12,345</p>
+          <h2 className="text-lg font-semibold mb-2">Total Clicks</h2>
+          <p className="text-3xl font-bold text-blue-600">{totalClicks}</p>
         </div>
 
-        {/* Card 2 */}
         <div className="bg-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold mb-2">Active Domains</h2>
-            <p className="text-3xl font-bold text-green-600">7</p>
+          <h2 className="text-lg font-semibold mb-2">Active Domains</h2>
+          <p className="text-3xl font-bold text-green-600">{activeDomains}</p>
         </div>
 
-        {/* Card 3 */}
         <div className="bg-white p-6 rounded-xl shadow">
-            <h2 className="text-lg font-semibold mb-2">Subscriptions</h2>
-            <p className="text-3xl font-bold text-purple-600">Pro</p>
+          <h2 className="text-lg font-semibold mb-2">Subscriptions</h2>
+          <p className="text-3xl font-bold text-purple-600">{subscription}</p>
         </div>
-    </div>
+      </div>
 
-    {/* Example Table */ }
-    <div className="mt-8 bg-white p-6 rounded-xl shadow">
+      {/* Recent Activity Table */}
+      <div className="mt-8 bg-white p-6 rounded-xl shadow">
         <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
         <table className="w-full text-left border-collapse">
-            <thead>
-                <tr>
-                    <th className="border-b p-2">URL</th>
-                    <th className="border-b p-2">Clicks</th>
-                    <th className="border-b p-2">Date</th>
+          <thead>
+            <tr>
+              <th scope="col" className="border-b p-2">URL</th>
+              <th scope="col" className="border-b p-2">Clicks</th>
+              <th scope="col" className="border-b p-2">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {urls.length > 0 ? (
+              urls.slice(0, 5).map((url) => (
+                <tr key={url._id}>
+                  <td className="border-b p-2 text-blue-600">{url.shortUrl}</td>
+                  <td className="border-b p-2">{url.clicks || 0}</td>
+                  <td className="border-b p-2">
+                    {new Date(url.createdAt).toLocaleDateString()}
+                  </td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td className="border-b p-2">bit.ly/abc123</td>
-                    <td className="border-b p-2">532</td>
-                    <td className="border-b p-2">2025-08-29</td>
-                </tr>
-                <tr>
-                    <td className="border-b p-2">bit.ly/xyz789</td>
-                    <td className="border-b p-2">214</td>
-                    <td className="border-b p-2">2025-08-27</td>
-                </tr>
-            </tbody>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="text-center text-gray-500 p-4">
+                  No recent activity
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
-    </div>
-        </main >
+      </div>
+    </main>
   );
 };
 

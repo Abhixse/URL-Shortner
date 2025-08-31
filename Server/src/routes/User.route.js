@@ -5,8 +5,8 @@ import { authLimiter } from "../middleware/rateLimiter.middleware.js";
 
 const router = Router();
 
-router.route("/login").post(authLimiter, loginUser);
-router.route("/signup").post(authLimiter, signupUser);
+router.route("/login").post( loginUser);
+router.route("/signup").post(signupUser);
 router.route("/logout").post(auth, logoutUser);
 
 

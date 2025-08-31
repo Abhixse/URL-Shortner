@@ -13,12 +13,14 @@ export const ApiProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [logOut, setLogOut] = useState(false);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   // Generic fetch handler
   const fetchData = async (endpoint, setter) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:5000/api/${endpoint}`);
+      const res = await fetch(`${API_BASE_URL}/${endpoint}`);
       if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
       const data = await res.json();
       setter(data);
@@ -38,6 +40,7 @@ export const ApiProvider = ({ children }) => {
     <ApiContext.Provider
       value={{
         user,
+        setUser,
         urls,
         analytics,
         loading,
@@ -45,6 +48,7 @@ export const ApiProvider = ({ children }) => {
         fetchUser,
         fetchUrls,
         fetchAnalytics,
+        logOut
       }}
     >
       {children}
